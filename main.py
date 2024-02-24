@@ -10,9 +10,18 @@ from tkinter import filedialog
 
 os.system('cls')
 
+#image:path`s
+
+iconPath = 'res\\icons\\dodecahedron.ico'
+dndLight = 'res\\icons\\dndLight.png'
+dndDark  = 'res\\icons\\dndDark.png'
+
 #constants:
 friendTasks = False
-Theme = "Тёмная"
+Theme = get_appearance_mode()
+
+set_default_color_theme = 'blue'
+
 Language = "RUS"
 testing = False
 Difficult = ["Easy", "Peaceful", "Normal", "Hard", "HARDCORE", "MIND"]
@@ -36,22 +45,29 @@ seconds = 00
 def start():
     global app
     app=CTk()
+    try:
+        app.iconbitmap(iconPath)
+    except:
+        pass
+
     app.overrideredirect(False)
-    #app.iconbitmap("res\\icons\\dodecahedron.ico")
-    app.title("Математическое тестирование | Версия: 2F01")
+    app.title("Математическое тестирование | Версия: 2F02")
     app.geometry("900x600")
     app.minsize(900, 600)
     app.resizable(False,False)
 
     helloloop()
     app.mainloop()
+
 def switch_Theme():
     global ThemeButton,Theme
     theme = "Light" if switch_var.get() == "on" else "Dark"
-    if theme == "Light": set_appearance_mode("Dark"); Theme='Тёмная'#; app.iconbitmap("res\\icons\\dodecahedron.ico")
-    else: set_appearance_mode("Light"); Theme='Светлая'#; app.iconbitmap("res\\icons\\icosahedron.ico")
+    if theme == "Light": set_appearance_mode("Dark"); Theme='Dark'
+    else: set_appearance_mode("Light"); Theme='Light'
 
     ThemeButton.configure(text=Theme)
+
+
 def helloloop():
     global panel_L,panel_R,Theme,ThemeButton,switch_var,DifficultVar,QuestionF
     global AllTasks,Score,taskcount,correctTaskCount,testing,realTaskPosition
@@ -60,10 +76,24 @@ def helloloop():
     QuestionF = ''
 
     try:
+        DragAndDropFrame.forget()
+        downFrame.forget()
+        backbutton.forget()
+    except:
+        pass
+
+    try:
         LeftFrame.forget()
         RightFrame.forget()
     except:
         pass
+    
+    try:
+        pLeftFrame.forget()
+        pRightFrame.forget()
+    except:
+        pass
+
     try:
         upperFrame.forget()
         bottomFrame.forget()
@@ -101,9 +131,11 @@ def helloloop():
 
     GraphButton = CTkButton(panel_L, height=70, width=160,corner_radius=10,text=" Прорешать готовый билет ",font=('courier new',20),command=openTestFile)
     GraphButton.pack(padx=10,pady=10)
-    GraphButton.place(relx=0.4, rely=0.7,anchor='sw')
+    GraphButton.place(relx=0.38, rely=0.7,anchor='sw')
     GraphButton.pack_propagate(0)
 
+    versionLabel = CTkLabel(panel_L,text='Version: 2F02 | Created by @slide36',font=('Courier new',12))
+    versionLabel.pack(side=BOTTOM)
     #RIGTH FRAME
     panel_R = CTkFrame(app, height=600, width=350,corner_radius=10)
     panel_R.pack(side=LEFT,padx=10,pady=10)
@@ -152,7 +184,7 @@ def helloloop():
 
     SinfoLabel = CTkLabel(SinfoDock,text="ОГРАНИЧЕНИЯ",font=('courier new',36))
     SinfoLabel.pack(padx=10,pady=24)
-
+    
 
     def timePlus():
         global minute,seconds
@@ -535,8 +567,10 @@ def saveData():
     
     print('Данные сохранены в файл result.json')
     saveButton.configure(text='Данные успешно сохранены!',state=DISABLED)
+
 def createloop():
-    global Score, PositionQA,Label,QuestionLabel,answerInput,saveTaskName,LeftFrame,RightFrame,LabelLog,scoreLabel
+    global Score,PositionQA,Label,QuestionLabel,answerInput,saveTaskName,LeftFrame,RightFrame,LabelLog,scoreLabel
+
     PositionQA = 1
     panel_L.forget()
     panel_R.forget()
@@ -551,7 +585,6 @@ def createloop():
     
     QuestionLabel = CTkTextbox(missionFrame, height=200, width=650,
                              corner_radius=10,
-                             #placeholder_text='Введите условие задачи здесь.',
                              font=('consolas',20),
                              wrap=WORD)
     
@@ -731,6 +764,7 @@ def add_QA_in_test():
     if PositionQA > Score:
         LabelLog.configure(text='\nЗадание {} добавленно в сток!'.format(PositionQA))
         print("Задание {} добавленно в сток!".format(PositionQA))
+
 def saveAndOpen():
     try:
         os.system(f'start {filename}.json')
@@ -738,33 +772,43 @@ def saveAndOpen():
         pass
     helloloop()
     pass
+
 def open_file_dialog(entry_widget):
+    global realTaskPosition, filename
+    realTaskPosition = 1
+
     file_path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
     entry_widget.delete(0, tk.END)
     entry_widget.insert(tk.END, file_path)
     openButton.configure(state=DISABLED)
     pathInput.configure(state=DISABLED)
 
-    app.after(3000, friendTest)
+    filename = os.path.relpath(file_path)
+    app.after(100, friendTest)
 
 def back():
     backbutton.forget()
     downFrame.forget()
     DragAndDropFrame.forget()
     helloloop()
-def openTestFile():
-    global DragAndDropFrame,DADlabel,downFrame,backbutton,pathInput,openButton
 
-    panel_L.forget()
-    panel_R.forget()
+def openTestFile():
+    global DragAndDropFrame,downFrame,backbutton,pathInput,openButton
+
+    try:
+        DragAndDropFrame.forget()
+        downFrame.forget()
+        backbutton.forget()
+        LeftFrame.forget()
+        RightFrame.forget()
+
+    except:
+        panel_L.forget()
+        panel_R.forget()
 
     DragAndDropFrame = CTkFrame(app, height=300, width=500)
     DragAndDropFrame.pack(padx=10, pady=50, side=TOP)
     DragAndDropFrame.pack_propagate(0)
-
-    DADimage = CTkImage(light_image=Image.open('res\\icons\\drag-and-drop.png'),
-                        dark_image=Image.open('res\\icons\\dad_dark.png'),
-                        size=(128,128))
 
     DADlabele = CTkLabel(DragAndDropFrame,height=70,width=128,
                         text='Укажите путь до файла \nили закиньте его в это поле.',
@@ -772,10 +816,24 @@ def openTestFile():
     DADlabele.pack(side=BOTTOM,pady=10)
     DADlabele.pack_propagate(0)
 
-    DADlabel = CTkLabel(DragAndDropFrame,height=60,width=60,
+    try:
+        DADimage = CTkImage(light_image=Image.open(dndLight),
+                            dark_image=Image.open(dndDark),
+                            size=(128,128))
+
+        DADlabel = CTkLabel(DragAndDropFrame,height=60,width=60,
                         image=DADimage,text='')
-    DADlabel.pack(padx=10,pady=40)
-    DADlabel.pack_propagate(0)
+        DADlabel.pack(padx=10,pady=40)
+        DADlabel.pack_propagate(0)
+        
+    except:
+
+        DADlabel = CTkLabel(DragAndDropFrame,height=60,width=60,
+                        text='Невозможно прогрузить изображение!')
+        DADlabel.pack(padx=10,pady=40)
+        DADlabel.pack_propagate(0)
+
+        pass
 
     downFrame = CTkFrame(app, height=50, width=500)
     downFrame.pack(pady=10)
@@ -790,35 +848,22 @@ def openTestFile():
     backbutton = CTkButton(app,width=500, text='Назад в меню', command=back)
     backbutton.pack(side=BOTTOM, padx=10, pady=10)
 
-    #DADlabel.register_drop_target("*")
-    #DADlabel.bind('<<Drop>>', drop)
-
 def friendTest():
-    global Score,testO,realTaskPosition,answerInput,QuestionLabel,scoreLabel,friendTasks,taskcount,correctTaskCount,_result,timerClock, trueAnswer
-    global LeftFrame,RightFrame
+    global answerInput,QuestionLabel,scoreLabel,PositionLabel
+    global pLeftFrame,pRightFrame
 
-    trueAnswer = ""
-    friendTasks = True
-    Score = 0
-    realTaskPosition = 1
-
-    testO = pathInput.get()
-    backbutton.forget()
-    downFrame.forget()
     DragAndDropFrame.forget()
-
-    taskcount = 0
-    correctTaskCount = 0
-    _result = 0
+    downFrame.forget()
+    backbutton.forget()
 
     panel_L.forget()
     panel_R.forget()
 
-    LeftFrame = CTkFrame(app, height=600, width=600,corner_radius=10)
-    LeftFrame.pack(side=LEFT,padx=10,pady=10)
-    LeftFrame.pack_propagate(0)
+    pLeftFrame = CTkFrame(app, height=600, width=600,corner_radius=10)
+    pLeftFrame.pack(side=LEFT,padx=10,pady=10)
+    pLeftFrame.pack_propagate(0)
 
-    missionFrame = CTkFrame(LeftFrame, height=200, width=650,corner_radius=10)
+    missionFrame = CTkFrame(pLeftFrame, height=200, width=650,corner_radius=10)
     missionFrame.pack(padx=10,pady=10)
     missionFrame.pack_propagate(0)
     
@@ -826,8 +871,7 @@ def friendTest():
     QuestionLabel.pack(padx=10,pady=10)
     QuestionLabel.pack_propagate(0)
 
-    pickQuestion()
-    answerFrame = CTkFrame(LeftFrame, height=60, width=650,corner_radius=10)
+    answerFrame = CTkFrame(pLeftFrame, height=60, width=650,corner_radius=10)
     answerFrame.pack(padx=10,pady=10)
     answerFrame.pack_propagate(0)
 
@@ -837,19 +881,19 @@ def friendTest():
     sendAnswerButton = CTkButton(answerFrame, text='Ответить',height=60,width=90, font=('consolas',12),command=AnswerTest)
     sendAnswerButton.pack(padx=10,pady=10,side=RIGHT)
 
-    RightFrame = CTkFrame(app, height=600, width=300,corner_radius=10)
-    RightFrame.pack(side=LEFT,padx=10,pady=10)
-    RightFrame.pack_propagate(0)
+    pRightFrame = CTkFrame(app, height=600, width=300,corner_radius=10)
+    pRightFrame.pack(side=LEFT,padx=10,pady=10)
+    pRightFrame.pack_propagate(0)
 
-    timerFrame = CTkFrame(RightFrame, height=200, width=300,corner_radius=10)
-    timerFrame.pack(padx=10,pady=10)
-    timerFrame.pack_propagate(0)
+    PositionFrame = CTkFrame(pRightFrame, height=200, width=300,corner_radius=10)
+    PositionFrame.pack(padx=10,pady=10)
+    PositionFrame.pack_propagate(0)
 
-    timerClock = CTkLabel(timerFrame, height=200, width=300,corner_radius=10, text=TimeClock, font=('consolas',12))
-    timerClock.pack(padx=10,pady=10)
-    timerClock.pack_propagate(0)
+    PositionLabel = CTkLabel(PositionFrame, height=200, width=300,corner_radius=10, text=TimeClock, font=('consolas',12))
+    PositionLabel.pack(padx=10,pady=10)
+    PositionLabel.pack_propagate(0)
 
-    scoreFrame = CTkFrame(RightFrame, height=60, width=300,corner_radius=10)
+    scoreFrame = CTkFrame(pRightFrame, height=60, width=300,corner_radius=10)
     scoreFrame.pack(padx=10,pady=10)
     scoreFrame.pack_propagate(0)
 
@@ -857,54 +901,56 @@ def friendTest():
     scoreLabel.pack(padx=10,pady=10)
     scoreLabel.pack_propagate(0)
 
-    bottomFrame = CTkFrame(RightFrame,height=80, width=330,corner_radius=10)
+    bottomFrame = CTkFrame(pRightFrame,height=80, width=330,corner_radius=10)
     bottomFrame.pack(padx=10,pady=10,side=BOTTOM)
     bottomFrame.pack_propagate(0)
 
-    exitBeforeTimer = CTkButton(bottomFrame, height=60, width=100, corner_radius=10, text='Завершить\nдосрочно', font=('consolas',12), command=endTasks)
+    exitBeforeTimer = CTkButton(bottomFrame, height=60, width=100, corner_radius=10, text='Завершить\nдосрочно', font=('consolas',12), command=FriendTestEnd)
     exitBeforeTimer.pack(padx=10,pady=10,side=LEFT)
 
     backButton = CTkButton(bottomFrame, height=60, width=100, corner_radius=10, text='Назад', font=('consolas',12), command=helloloop)
     backButton.pack(padx=10,pady=10,side=LEFT)
     
+    pickQuestion()
     pass
 
 def pickQuestion():
-    global testO, realTaskPosition,trueAnswer,answerInput,QuestionLabel,taskcount,correctTaskCount
-
+    global realTaskPosition,trueAnswer
+    print(f'Path: {filename}')
+    
     try:
-        with open('{}.json'.format(filename), 'r') as file:
-            try:
-                data = json.load(file)
-                if str(realTaskPosition) in data:
+        with open(f'{filename}', 'r') as file:
+            data = json.load(file)
+            if str(realTaskPosition) in data:
                     current_data = data[str(realTaskPosition)]
-                    #QuestionLabel.delete('0.0', 'end')
                     QuestionLabel.configure(text=current_data["question"])
                     answerInput.delete(0, 'end')
                     trueAnswer = (current_data["answer"])
-                else:
-                    endTasks()
-            except:
-                endTasks
+            else:
+                FriendTestEnd()
 
-    except (FileNotFoundError, json.decoder.JSONDecodeError):
-            # Обработка исключений в случае отсутствия файла или неправильного формата JSON
-            pass
-
-    pass
+    except FileNotFoundError:
+        print('File not found error. Please check the file path.')
+        openTestFile()
+    except json.decoder.JSONDecodeError:
+        print('JSON decode error. Please check if the file contains valid JSON.')
+        openTestFile()
 
 def AnswerTest():
-    global Score, trueAnswer, realTaskPosition, answerInput, QuestionLabel, correctTaskCount, taskcount
+    global realTaskPosition, answerInput, QuestionLabel, correctTaskCount, taskcount
 
-    userAnswer = answerInput.get()
-
-    if str(userAnswer) == str(trueAnswer):
-        Score += 1
-        scoreLabel.configure(text=f"Score: {Score}")
+    if str(answerInput.get()) == str(trueAnswer):
+        scoreLabel.configure(text=f"Score: {correctTaskCount}")
         correctTaskCount += 1
 
     taskcount += 1
     realTaskPosition += 1
     pickQuestion()
+
+def FriendTestEnd():
+    LeftFrame.forget()
+    RightFrame.forget()
+
+    pass
 
 start()
