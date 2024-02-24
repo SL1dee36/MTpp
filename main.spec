@@ -6,9 +6,9 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('res/icons/dodecahedron.ico', 'res/icons'), 
-        ('res/icons/dndLight.png', 'res/icons'), 
-        ('res/icons/dndDark.png', 'res/icons')
+        ('res\\icons\\dodecahedron.ico', 'res\\icons'), 
+        ('res\\icons\\dndLight.png', 'res\\icons'), 
+        ('res\\icons\\dndDark.png', 'res\\icons')
     ],
     hiddenimports=[],
     hookspath=[],
