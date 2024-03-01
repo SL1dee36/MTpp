@@ -510,7 +510,7 @@ def endTasks():
     upRightFrame.pack(padx=10,pady=10,side=RIGHT)
     upRightFrame.pack_propagate(0)
 
-    upRtopLabel = CTkLabel(upRightFrame, text='friendTest завершенно',height=20,width=650)
+    upRtopLabel = CTkLabel(upRightFrame, text='Тестирование завершенно',height=20,width=650)
     upRtopLabel.pack(side=TOP,padx=10,pady=10)
 
     RightLabel = CTkLabel(upRightFrame,height=140,width=650,text=result,font=('consolas',16))
@@ -764,7 +764,6 @@ def add_QA_in_test():
     if PositionQA > Score:
         LabelLog.configure(text='\nЗадание {} добавленно в сток!'.format(PositionQA))
         print("Задание {} добавленно в сток!".format(PositionQA))
-
 def saveAndOpen():
     try:
         os.system(f'start {filename}.json')
@@ -772,7 +771,6 @@ def saveAndOpen():
         pass
     helloloop()
     pass
-
 def open_file_dialog(entry_widget):
     global realTaskPosition, filename
     realTaskPosition = 1
@@ -785,13 +783,6 @@ def open_file_dialog(entry_widget):
 
     filename = os.path.relpath(file_path)
     app.after(100, friendTest)
-
-def back():
-    backbutton.forget()
-    downFrame.forget()
-    DragAndDropFrame.forget()
-    helloloop()
-
 def openTestFile():
     global DragAndDropFrame,downFrame,backbutton,pathInput,openButton
 
@@ -845,9 +836,8 @@ def openTestFile():
     openButton = CTkButton(downFrame, width=200, text='Выбрать файл', command=lambda: open_file_dialog(pathInput))
     openButton.pack(side=RIGHT, padx=10, pady=10)
 
-    backbutton = CTkButton(app,width=500, text='Назад в меню', command=back)
+    backbutton = CTkButton(app,width=500, text='Назад в меню', command=helloloop)
     backbutton.pack(side=BOTTOM, padx=10, pady=10)
-
 def friendTest():
     global answerInput,QuestionLabel,scoreLabel,PositionLabel
     global pLeftFrame,pRightFrame
@@ -913,7 +903,6 @@ def friendTest():
     
     pickQuestion()
     pass
-
 def pickQuestion():
     global realTaskPosition,trueAnswer
     print(f'Path: {filename}')
@@ -948,8 +937,97 @@ def AnswerTest():
     pickQuestion()
 
 def FriendTestEnd():
-    LeftFrame.forget()
-    RightFrame.forget()
+    pLeftFrame.forget()
+    pRightFrame.forget()
+    
+    try:
+        _result = (correctTaskCount/taskcount)
+    except:
+        _result = 0
+
+    if _result <= 0.2:
+        message = random.choice([
+            "Ваш результат очень низкий. \nРекомендуем потренироваться еще немного! 📚",
+            "Уровень вашей математики очень низкий. \nПочитайте математическую литературу для улучшения знаний. 📖",
+            "Вам нужно больше практики. \nСосредоточьтесь на основах математики, \nчтобы улучшить результаты. 💪"
+        ])
+    elif 0.2 < _result <= 0.4:
+        message = random.choice([
+            "Продолжайте работать над собой. \nПрактика поможет вам улучшить результаты. 🏋️‍♂️",
+            "Ваши результаты могут быть лучше. \nПостарайтесь больше времени уделять учебе. 🤓",
+            "Не теряйте мотивацию. С постоянными тренировками \nвы достигнете желаемых результатов. 💡"
+        ])
+    elif 0.4 < _result <= 0.6:
+        message = random.choice([
+            "Вы на верном пути, однако есть место для улучшений. \nНе останавливайтесь! 🚀",
+            "У вас есть потенциал для роста. \nПродолжайте работать над собой и учиться. 💪",
+            "Не ограничивайте себя. \nСтремитесь к большему и у вас все получится! 🎯"
+        ])
+    elif 0.6 < _result <= 0.8:
+        message = random.choice([
+            "Ваши результаты хороши, но есть место для совершенствования. \nНе останавливайтесь на достигнутом! 🌟",
+            "Отличная работа! Продолжайте в том же духе \nи вы достигнете новых высот. 👍",
+            "Вы уже добились многого, но не забывайте, \nчто всегда есть возможность стать еще лучше. 🚀"
+        ])
+    elif 0.8 < _result <= 0.9:
+        message = random.choice([
+            "Ваши результаты впечатляют! \nПродолжайте двигаться квершинам! 🚀",
+            "Вы близки к отличным результатам! \nПродолжайте в том же духе! 💪",
+            "Ваш успех близок! Продолжайте так же \nстарательно работать, чтобы достичь своих целей! 🌟"
+        ])
+    elif 0.9 < _result <= 1.0:
+        message = random.choice([
+            "Поздравляем с отличными результатами! Вы молодец! 🎉",
+            "Прекрасно справляетесь! Так держать! 💪",
+            "Вы на вершине успеха! Продолжайте в том же духе! 🌟"
+        ])
+
+
+    result = 'Краткая статистика: \nВерно выполненых задач: {} из {}\nПроцентное соотношение: {}\n\n{}'.format(correctTaskCount,taskcount,_result,message)
+    
+    FTE_top = CTkFrame(app,height=450,width=900)
+    FTE_top.pack(padx=10,pady=10,side=TOP)
+    FTE_top.pack_propagate(0)
+
+    TOPleft = CTkScrollableFrame(FTE_top, height=450, width=250, label_text="Пройденные задачи {}".format(taskcount))
+    TOPleft.pack(padx=10,pady=10,side=LEFT)
+
+    TOPleftLabel = CTkLabel(TOPleft,width=250,font=('consolas',12),text=AllTasks)
+    TOPleftLabel.pack(padx=10,pady=10)
+
+    TOPright = CTkFrame(FTE_top,height=450,width=650)
+    TOPright.pack(padx=10,pady=10,side=RIGHT)
+    TOPright.pack_propagate(0)
+
+    TOPrightLabel = CTkLabel(TOPright, text='Тестирование завершенно',height=20,width=650)
+    TOPrightLabel.pack(side=TOP,padx=10,pady=10)
+
+    RightLabel = CTkLabel(TOPright,height=140,width=650,text=result,font=('consolas',16))
+    RightLabel.pack(padx=10,pady=10)
+
+    FTE_bott = CTkFrame(app,height=450,width=900)
+    FTE_bott.pack(padx=10,pady=10,side=BOTTOM)
+    FTE_bott.pack_propagate(0)
+
+    leftBottomFrame = CTkFrame(FTE_bott,height=450,width=270)
+    leftBottomFrame.pack(padx=10,pady=10,side=LEFT)
+    leftBottomFrame.pack_propagate(0)
+
+    saveButton = CTkButton(leftBottomFrame,height=450,width=270,text='Сохранить результат',font=('consolas',16),command=saveData)
+    saveButton.pack(padx=8,pady=8)
+    saveButton.pack_propagate(0)
+
+    rigthBottomFrame = CTkFrame(FTE_bott,height=450,width=650)
+    rigthBottomFrame.pack(padx=10,pady=10,side=RIGHT)
+    rigthBottomFrame.pack_propagate(0)
+
+    menuButtom = CTkButton(rigthBottomFrame,height=450,width=270,text='Вернуться в меню',font=('consolas',16),command=helloloop)
+    menuButtom.pack(padx=8,pady=8,side=RIGHT)
+    menuButtom.pack_propagate(0)
+
+    shareButton = CTkButton(rigthBottomFrame,height=450,width=270,text='Отправить отчёт',font=('consolas',16),command='share')
+    shareButton.pack(padx=8,pady=8,side=RIGHT)
+    shareButton.pack_propagate(0)
 
     pass
 
